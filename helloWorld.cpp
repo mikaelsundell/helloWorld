@@ -3,7 +3,7 @@
 // https://github.com/mikaelsundell/helloWorld
 
 #include <iostream>
-#include "helloFetch.h"
+#include <helloFetch/helloFetch.h>
 //#include <half.h>
 //#include <ImathVec.h>
 //#include <aces_Writer.h>
@@ -16,7 +16,7 @@ main(int argc, char **argv)
     helloFetch helloFetch;
     helloFetch.sayHello();
 
-    
+
     // imath
     /*
     {
