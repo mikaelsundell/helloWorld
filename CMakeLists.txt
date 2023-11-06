@@ -2,109 +2,116 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # https://github.com/mikaelsundell/helloWorld
 
-cmake_minimum_required(VERSION 3.23)
-set( project_name "helloWorld" )
+# usage:
+#   Build using system paths (verbose):
+#     cmake ../ -DCMAKE_VERBOSE_MAKEFILE:BOOL=1
+#  
+#   Build using prefix path (verbose):
+#     cmake -DCMAKE_PREFIX_PATH:STRING=<path>/3rdparty/build/macosx/arm64.debug -DCMAKE_VERBOSE_MAKEFILE:BOOL=1
+#
+#   Download and configure as cmake sub projects if not found
 
-project( "${project_name} project" )
+cmake_minimum_required (VERSION 3.23)
+set (CMAKE_SUPPRESS_DEVELOPER_WARNINGS TRUE)
 
-# modules
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/modules" )
+set (project_name "helloWorld")
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Debug")
-endif()
+project ("${project_name} project")
+
+# cmake
+list (APPEND CMAKE_MODULE_PATH
+      "${PROJECT_SOURCE_DIR}/cmake"
+      "${PROJECT_SOURCE_DIR}/cmake/modules")
+include (utils)
 
 # configuration
-message (STATUS "Configuring ${PROJECT_NAME} ${PROJECT_VERSION}")
-message (STATUS "CMake                  = ${CMAKE_VERSION}")
-message (STATUS "CMake system           = ${CMAKE_SYSTEM}")
-message (STATUS "CMake system name      = ${CMAKE_SYSTEM_NAME}")
-message (STATUS "Project source dir     = ${PROJECT_SOURCE_DIR}")
-message (STATUS "Project build dir      = ${CMAKE_BINARY_DIR}")
-message (STATUS "Project install prefix = ${CMAKE_INSTALL_PREFIX}")
+message (STATUS "Configuration")
+if (NOT CMAKE_BUILD_TYPE)
+    set (CMAKE_BUILD_TYPE "Debug")
+endif ()
+dump_configuration (${project_name})
 
 # externals
-message (STATUS "Configuring external")
+message (STATUS "Dependencies")
+include (FetchContent)
 
-include (ExternalProject)
-set (external_prefix "${CMAKE_CURRENT_BINARY_DIR}/external")
-set( imath_build 1 )
-set( openexr_build 0 )
-set( acescontainer_build 1 )
-set( libraw_build 1 )
+# helloFetch
+set (helloFetch_tag "master")
+message (STATUS "Download and build helloFetch: ${helloFetch_tag}")
+FetchContent_Declare(
+    helloFetch
+    GIT_REPOSITORY https://github.com/mikaelsundell/helloFetch.git
+    GIT_TAG ${helloFetch_tag}
+    CMAKE_ARGS 
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    QUIET
+)
+FetchContent_MakeAvailable (helloFetch)
+dump_fetch (helloFetch)
 
-if ( imath_build )
-    message (STATUS "Download and build Imath")
-    
-    set (imath_prefix "${external_prefix}/git/imath")
-    ExternalProject_Add( 
-        imath
-        GIT_REPOSITORY https://github.com/AcademySoftwareFoundation/Imath.git
-        GIT_TAG "v3.1.9"
-        PREFIX ${imath_prefix}
-        INSTALL_DIR ${external_prefix}
-        CMAKE_ARGS 
-            -DBUILD_TESTING=OFF
-            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} 
-            -DCMAKE_INSTALL_PREFIX=${external_prefix} 
-    )
-endif()
+# # imath
+# find_package (Imath CONFIG QUIET)
+# if (NOT Imath_FOUND)
+#     find_package (Imath QUIET)
+#     if (NOT Imath_FOUND)
+#         set (imath_tag "v3.1.9")
+#         message (STATUS "Download and build Imath: ${imath_tag}")
+#         FetchContent_Declare(
+#             Imath
+#             GIT_REPOSITORY https://github.com/AcademySoftwareFoundation/Imath.git
+#             GIT_TAG ${imath_tag}
+#             CMAKE_ARGS 
+#                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+#             QUIET
+#         )
+#         FetchContent_MakeAvailable (Imath)
+#         dump_fetch (Imath)
+#     else ()
+#         message (STATUS "Found imath package using cmake modules")
+#         dump_properties ("Imath")
+#     endif ()
+# else()
+#     message (STATUS "Found imath package using cmake config")
+#     dump_properties ("Imath")
+# endif ()
 
-if ( openexr_build )
-    message (STATUS "Download and build OpenEXR")
+# # acescontainer
+# find_package (AcesContainer CONFIG QUIET)   
+# if (NOT AcesContainer_FOUND)
+#     find_package (Imath QUIET)
+#     if (NOT AcesContainer_FOUND)
+#         set (acescontainer_tag "v1.0.2")
+#         message (STATUS "Download and build ACES Container: ${acescontainer_tag}")
+#         FetchContent_Declare(
+#             AcesContainer
+#             GIT_REPOSITORY https://github.com/ampas/aces_container.git
+#             GIT_TAG ${acescontainer_tag}
+#             CMAKE_ARGS 
+#                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+#             QUIET
+#         )
+#         FetchContent_MakeAvailable (AcesContainer)
+#         dump_fetch (AcesContainer)
+#     else ()
+#         message (STATUS "Found acescontainer package using cmake modules")
+#         dump_properties ("AcesContainer")
+#     endif ()
+# else()
+#     message (STATUS "Found acescontainer package using cmake config")
+#     add_library (helloWorld::AcesContainer INTERFACE IMPORTED)
+#     target_link_libraries(helloWorld::AcesContainer INTERFACE AcesContainer)
+#     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#         target_link_libraries (
+#             helloWorld::AcesContainer INTERFACE "AcesContainer"
+#         )
+#         target_link_libraries (
+#             helloWorld::AcesContainer INTERFACE "AcesContainer_d"
+#         )
+#     endif ()
+#     dump_properties ("AcesContainer")
+# endif ()
 
-    set (openexr_prefix "${external_prefix}/git/openexr")
-    ExternalProject_Add( 
-        openexr
-        GIT_REPOSITORY https://github.com/openexr/openexr.git
-        GIT_TAG "v3.2.0"
-        PREFIX ${openexr_prefix}
-        INSTALL_DIR ${external_prefix}
-        CMAKE_ARGS 
-            -DBUILD_TESTING=OFF 
-            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} 
-            -DCMAKE_PREFIX_PATH=${external_prefix} 
-            -DCMAKE_INSTALL_PREFIX=${external_prefix} 
-    )
-endif()
-
-if (acescontainer_build)
-    message (STATUS "Download and build ACES Container")
-    
-    set (acescontainer_prefix "${external_prefix}/git/aces_container")
-    ExternalProject_Add( 
-        acescontainer
-        GIT_REPOSITORY https://github.com/ampas/aces_container.git
-        GIT_TAG "v1.0.2"
-        PREFIX ${acescontainer_prefix}
-        INSTALL_DIR ${external_prefix}
-        CMAKE_ARGS 
-            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} 
-            -DCMAKE_INSTALL_PREFIX=${external_prefix} 
-    )
-endif()
-
-#if (libraw_build)
-#    message (STATUS "Download and build LibRaw")
-    # dependencies: jpeg, jasper and lcms2?
-#    set (libraw_prefix "${external_prefix}/git/libraw")
-#    ExternalProject_Add( 
-#        libraw
-#        GIT_REPOSITORY https://github.com/LibRaw/LibRaw.git
-#        GIT_TAG "0.21.1"
-#        PREFIX ${libraw_prefix}
-#        BUILD_IN_SOURCE 1
-#        CONFIGURE_COMMAND 
-#            ./mkdist.sh && ./configure
-#    )
-#endif()
-
-# package
+# helloWorld
 add_executable(${project_name} "helloWorld.cpp")
 set_property (TARGET ${project_name} PROPERTY CXX_STANDARD 17)
-
-include_directories(
-)
-
-target_link_libraries( ${project_name}
-)
+#target_link_libraries(${project_name} PRIVATE Imath::Imath helloWorld::AcesContainer)
