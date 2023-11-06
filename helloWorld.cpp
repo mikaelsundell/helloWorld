@@ -3,8 +3,8 @@
 // https://github.com/mikaelsundell/helloWorld
 
 #include <iostream>
-#include <half.h>
-#include <ImathVec.h>
+//#include <half.h>
+//#include <ImathVec.h>
 //#include <aces_Writer.h>
 
 int
@@ -12,6 +12,7 @@ main(int argc, char **argv)
 {
     std::cout << "hello, world!" << std::endl;
     // imath
+    /*
     {
         std::cout << "imath test" << std::endl;
         
@@ -38,7 +39,7 @@ main(int argc, char **argv)
                     << ", " 
                     << half2
                     << ")" << std::endl;
-    }
+    }*/
     // aces container
     /*{
         std::cout << "aces_container test" << std::endl;
