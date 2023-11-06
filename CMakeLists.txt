@@ -49,6 +49,19 @@ FetchContent_Declare(
 FetchContent_MakeAvailable (helloFetch)
 dump_fetch (helloFetch)
 
+# set (imath_tag "v3.1.9")
+# message (STATUS "Download and build Imath: ${imath_tag}")
+# FetchContent_Declare(
+#     Imath
+#     GIT_REPOSITORY https://github.com/AcademySoftwareFoundation/Imath.git
+#     GIT_TAG ${imath_tag}
+#     CMAKE_ARGS 
+#         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+#     QUIET
+# )
+# FetchContent_MakeAvailable (Imath)
+# dump_fetch (Imath)
+
 # # imath
 # find_package (Imath CONFIG QUIET)
 # if (NOT Imath_FOUND)
@@ -112,6 +125,13 @@ dump_fetch (helloFetch)
 # endif ()
 
 # helloWorld
-add_executable(${project_name} "helloWorld.cpp")
-set_property (TARGET ${project_name} PROPERTY CXX_STANDARD 17)
-#target_link_libraries(${project_name} PRIVATE Imath::Imath helloWorld::AcesContainer)
+add_executable (${project_name} "helloWorld.cpp")
+target_link_libraries (${project_name} helloFetch)
+
+# install
+include(GNUInstallDirs)
+install(
+    TARGETS ${project_name}
+    EXPORT helloWorldTargets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)

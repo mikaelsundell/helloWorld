@@ -3,6 +3,7 @@
 // https://github.com/mikaelsundell/helloWorld
 
 #include <iostream>
+#include "helloFetch.h"
 //#include <half.h>
 //#include <ImathVec.h>
 //#include <aces_Writer.h>
@@ -11,6 +12,11 @@ int
 main(int argc, char **argv)
 {
     std::cout << "hello, world!" << std::endl;
+
+    helloFetch helloFetch;
+    helloFetch.sayHello();
+
+    
     // imath
     /*
     {
