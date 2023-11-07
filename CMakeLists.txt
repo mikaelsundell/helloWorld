@@ -11,7 +11,7 @@
 #
 #   Download and configure as cmake sub projects if not found
 
-cmake_minimum_required (VERSION 3.23)
+cmake_minimum_required (VERSION 3.22)
 set (CMAKE_SUPPRESS_DEVELOPER_WARNINGS TRUE)
 
 set (project_name "helloWorld")
