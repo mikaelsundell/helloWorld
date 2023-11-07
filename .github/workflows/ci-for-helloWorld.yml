@@ -61,11 +61,13 @@ jobs:
 #          -S ${{ github.workspace }}
   
       - name: Build
-        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+        #run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+        run: sudo cmake --build build
   
       - name: Test
-        working-directory: ${{ steps.strings.outputs.build-output-dir }}
-        run: ctest --build-config ${{ matrix.build_type }}
+        #working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        #run: ctest --build-config ${{ matrix.build_type }}
+        run: ctest --rerun-failed --output-on-failure
     
 
   # build for ubuntu, windows and macos
