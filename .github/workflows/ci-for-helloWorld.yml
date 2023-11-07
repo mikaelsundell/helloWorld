@@ -12,7 +12,7 @@ jobs:
 
   aswf-build:
 
-    name: "VFX${{matrix.vfxyear}} ${{matrix.desc}}"
+    name: "aswf-VFX${{matrix.vfxyear}} ${{matrix.desc}}"
     runs-on: ${{ matrix.os }}
     container:
       image: ${{ matrix.container }}
@@ -68,6 +68,8 @@ jobs:
   # build for ubuntu, windows and macos
 
   os-build:
+
+    name: "os-${{matrix.os}} ${{matrix.c_compiler}}"
     runs-on: ${{ matrix.os }}
 
     strategy:
