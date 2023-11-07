@@ -29,17 +29,8 @@ jobs:
             container: aswf/ci-osl:2022-clang11
             vfxyear: 2022
             cxx_std: 17
-            c_compiler: clang
-            cpp_compiler: clang++
-
-          - desc: gcc9 # /C++17 boost1.76 exr3.1
-            nametag: linux-vfx2022
-            os: ubuntu-latest
-            container: aswf/ci-osl:2022-clang11
-            vfxyear: 2022
-            cxx_std: 17
-            c_compiler: clang
-            cpp_compiler: clang++
+            c_compiler: gcc
+            cpp_compiler: g++
 
     env:
       CXX: ${{matrix.cpp_compiler}}
