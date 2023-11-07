@@ -21,6 +21,7 @@ jobs:
       fail-fast: false 
 
       matrix:
+        build_type: [Release]
         include:
           - desc: gcc9 # /C++17 boost1.76 exr3.1
             nametag: linux-vfx2022
@@ -28,12 +29,22 @@ jobs:
             container: aswf/ci-osl:2022-clang11
             vfxyear: 2022
             cxx_std: 17
+            c_compiler: clang
+            cpp_compiler: clang++
+
+          - desc: gcc9 # /C++17 boost1.76 exr3.1
+            nametag: linux-vfx2022
+            os: ubuntu-latest
+            container: aswf/ci-osl:2022-clang11
+            vfxyear: 2022
+            cxx_std: 17
+            c_compiler: clang
+            cpp_compiler: clang++
 
     env:
-      CXX: ${{matrix.cxx_compiler}}
-      CC: ${{matrix.cc_compiler}}
+      CXX: ${{matrix.cpp_compiler}}
+      CC: ${{matrix.c_compiler}}
       CMAKE_CXX_STANDARD: ${{matrix.cxx_std}}
-      OPENEXR_VERSION: ${{matrix.openexr_ver}}
 
     steps:
       - uses: actions/checkout@v3
@@ -69,7 +80,7 @@ jobs:
 
   os-build:
 
-    name: "os-${{matrix.os}} ${{matrix.c_compiler}}"
+    name: "os-${{matrix.os}} ${{matrix.desc}}"
     runs-on: ${{ matrix.os }}
 
     strategy:
