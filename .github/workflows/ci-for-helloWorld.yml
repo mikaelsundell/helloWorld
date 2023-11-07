@@ -7,7 +7,67 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+
+  # build for aswf
+
+  aswf-build:
+
+    name: "VFX${{matrix.vfxyear}} ${{matrix.desc}}"
+    runs-on: ${{ matrix.os }}
+    container:
+      image: ${{ matrix.container }}
+
+    strategy:
+      fail-fast: false 
+
+      matrix:
+        include:
+          - desc: gcc9 # /C++17 boost1.76 exr3.1
+            nametag: linux-vfx2022
+            os: ubuntu-latest
+            container: aswf/ci-osl:2022-clang11
+            vfxyear: 2022
+            cxx_std: 17
+
+    env:
+      CXX: ${{matrix.cxx_compiler}}
+      CC: ${{matrix.cc_compiler}}
+      CMAKE_CXX_STANDARD: ${{matrix.cxx_std}}
+      OPENEXR_VERSION: ${{matrix.openexr_ver}}
+
+    steps:
+      - uses: actions/checkout@v3
+  
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+          echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+  
+      - name: Bootstrap
+        shell: bash
+        run: |
+          ci/ci-printos.bash
+  
+      - name: Configure CMake
+        run: >
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -S ${{ github.workspace }}
+  
+      - name: Build
+        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+  
+      - name: Test
+        working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        run: ctest --build-config ${{ matrix.build_type }}
+    
+
+  # build for ubuntu, windows and macos
+
+  os-build:
     runs-on: ${{ matrix.os }}
 
     strategy:
